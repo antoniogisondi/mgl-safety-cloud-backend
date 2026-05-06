@@ -1,0 +1,50 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Build folders
+/bin/
+/dist/
+/build/
+
+# Go
+*.test
+*.out
+coverage.out
+
+# Vendor
+/vendor/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# Air live reload
+.air/
+
+# Docker
+docker-data/
+
+# Generated files
+*.pdf
+*.zip
+
+# Cache
+.cache/
