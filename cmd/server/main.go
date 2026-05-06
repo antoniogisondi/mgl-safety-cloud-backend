@@ -8,6 +8,8 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/database"
+
+	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/auth"
 )
 
 func main() {
@@ -18,6 +20,7 @@ func main() {
 	}
 
 	database.Connect()
+	database.Migrate()
 
 	app := fiber.New()
 
@@ -26,6 +29,11 @@ func main() {
 			"message": "API Online",
 		})
 	})
+
+	api := app.Group("/api")
+
+	api.Post("/auth/register", auth.Register)
+	api.Post("/auth/login", auth.Login)
 
 	log.Fatal(app.Listen(":8080"))
 }

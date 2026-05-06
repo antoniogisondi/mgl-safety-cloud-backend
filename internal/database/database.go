@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -21,4 +22,13 @@ func Connect() {
 	DB = db
 
 	log.Println("Database Supabase connesso correttamente")
+}
+
+func Migrate() {
+	err := DB.AutoMigrate(&models.User{})
+	if err != nil {
+		log.Fatal("Errore migrazione database: ", err)
+	}
+
+	log.Println("Migrazione database completata")
 }
