@@ -10,10 +10,32 @@ import (
 func GetCompanies(c *fiber.Ctx) error {
 	var companies []models.Company
 
-	if err := database.DB.Preload("Client").Find(&companies).Error; err != nil {
+	if err := database.DB.
+		Preload("Workers.Deadlines").
+		Preload("Deadlines").
+		Find(&companies).Error; err != nil {
+
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Errore recupero aziende",
 		})
+	}
+
+	for i := range companies {
+
+		if companies[i].Workers == nil {
+			companies[i].Workers = []models.Worker{}
+		}
+
+		if companies[i].Deadlines == nil {
+			companies[i].Deadlines = []models.Deadline{}
+		}
+
+		for j := range companies[i].Workers {
+
+			if companies[i].Workers[j].Deadlines == nil {
+				companies[i].Workers[j].Deadlines = []models.Deadline{}
+			}
+		}
 	}
 
 	return c.JSON(companies)
@@ -24,10 +46,29 @@ func GetCompany(c *fiber.Ctx) error {
 
 	var company models.Company
 
-	if err := database.DB.Preload("Client").First(&company, id).Error; err != nil {
+	if err := database.DB.
+		Preload("Workers.Deadlines").
+		Preload("Deadlines").
+		First(&company, id).Error; err != nil {
+
 		return c.Status(404).JSON(fiber.Map{
 			"error": "Azienda non trovata",
 		})
+	}
+
+	if company.Workers == nil {
+		company.Workers = []models.Worker{}
+	}
+
+	if company.Deadlines == nil {
+		company.Deadlines = []models.Deadline{}
+	}
+
+	for i := range company.Workers {
+
+		if company.Workers[i].Deadlines == nil {
+			company.Workers[i].Deadlines = []models.Deadline{}
+		}
 	}
 
 	return c.JSON(company)

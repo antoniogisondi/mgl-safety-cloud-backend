@@ -17,6 +17,7 @@ type Worker struct {
 	Notes      string     `json:"notes"`
 	CompanyID  uint       `gorm:"not null" json:"company_id"`
 	Company    Company    `gorm:"foreignKey:CompanyID" json:"-"`
+	Deadlines  []Deadline `json:"deadlines"`
 	CreatedAt  time.Time  `json:"created_at"`
 	UpdatedAt  time.Time  `json:"updated_at"`
 }

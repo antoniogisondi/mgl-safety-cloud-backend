@@ -10,10 +10,16 @@ import (
 func GetWorkers(c *fiber.Ctx) error {
 	var workers []models.Worker
 
-	if err := database.DB.Preload("Company").Find(&workers).Error; err != nil {
+	if err := database.DB.Preload("Deadlines").Find(&workers).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Errore recupero lavoratori",
 		})
+	}
+
+	for i := range workers {
+		if workers[i].Deadlines == nil {
+			workers[i].Deadlines = []models.Deadline{}
+		}
 	}
 
 	return c.JSON(workers)
@@ -24,10 +30,14 @@ func GetWorker(c *fiber.Ctx) error {
 
 	var worker models.Worker
 
-	if err := database.DB.Preload("Company").First(&worker, id).Error; err != nil {
+	if err := database.DB.Preload("Deadlines").First(&worker, id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"error": "Lavoratore non trovato",
 		})
+	}
+
+	if worker.Deadlines == nil {
+		worker.Deadlines = []models.Deadline{}
 	}
 
 	return c.JSON(worker)

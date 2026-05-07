@@ -10,7 +10,11 @@ import (
 func GetClients(c *fiber.Ctx) error {
 	var clients []models.Client
 
-	if err := database.DB.Preload("Companies.Workers").Find(&clients).Error; err != nil {
+	if err := database.DB.
+		Preload("Companies.Workers.Deadlines").
+		Preload("Companies.Deadlines").
+		Find(&clients).Error; err != nil {
+
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Errore recupero clienti",
 		})
@@ -25,6 +29,16 @@ func GetClients(c *fiber.Ctx) error {
 			if clients[i].Companies[j].Workers == nil {
 				clients[i].Companies[j].Workers = []models.Worker{}
 			}
+
+			if clients[i].Companies[j].Deadlines == nil {
+				clients[i].Companies[j].Deadlines = []models.Deadline{}
+			}
+
+			for k := range clients[i].Companies[j].Workers {
+				if clients[i].Companies[j].Workers[k].Deadlines == nil {
+					clients[i].Companies[j].Workers[k].Deadlines = []models.Deadline{}
+				}
+			}
 		}
 	}
 
@@ -36,7 +50,11 @@ func GetClient(c *fiber.Ctx) error {
 
 	var client models.Client
 
-	if err := database.DB.Preload("Companies.Workers").First(&client, id).Error; err != nil {
+	if err := database.DB.
+		Preload("Companies.Workers.Deadlines").
+		Preload("Companies.Deadlines").
+		First(&client, id).Error; err != nil {
+
 		return c.Status(404).JSON(fiber.Map{
 			"error": "Cliente non trovato",
 		})
@@ -49,6 +67,16 @@ func GetClient(c *fiber.Ctx) error {
 	for i := range client.Companies {
 		if client.Companies[i].Workers == nil {
 			client.Companies[i].Workers = []models.Worker{}
+		}
+
+		if client.Companies[i].Deadlines == nil {
+			client.Companies[i].Deadlines = []models.Deadline{}
+		}
+
+		for j := range client.Companies[i].Workers {
+			if client.Companies[i].Workers[j].Deadlines == nil {
+				client.Companies[i].Workers[j].Deadlines = []models.Deadline{}
+			}
 		}
 	}
 
