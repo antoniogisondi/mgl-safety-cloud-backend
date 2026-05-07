@@ -16,6 +16,8 @@ import (
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/clients"
 
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/companies"
+
+	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/workers"
 )
 
 func main() {
@@ -62,6 +64,12 @@ func main() {
 	protected.Post("/companies", companies.CreateCompany)
 	protected.Put("/companies/:id", companies.UpdateCompany)
 	protected.Delete("/companies/:id", companies.DeleteCompany)
+
+	protected.Get("/workers", workers.GetWorkers)
+	protected.Get("/workers/:id", workers.GetWorker)
+	protected.Post("/workers", workers.CreateWorker)
+	protected.Put("/workers/:id", workers.UpdateWorker)
+	protected.Delete("/workers/:id", workers.DeleteWorker)
 
 	log.Fatal(app.Listen(":8080"))
 }

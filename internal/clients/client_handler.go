@@ -10,7 +10,7 @@ import (
 func GetClients(c *fiber.Ctx) error {
 	var clients []models.Client
 
-	if err := database.DB.Preload("Companies").Find(&clients).Error; err != nil {
+	if err := database.DB.Preload("Companies.Workers").Find(&clients).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Errore recupero clienti",
 		})
@@ -19,6 +19,12 @@ func GetClients(c *fiber.Ctx) error {
 	for i := range clients {
 		if clients[i].Companies == nil {
 			clients[i].Companies = []models.Company{}
+		}
+
+		for j := range clients[i].Companies {
+			if clients[i].Companies[j].Workers == nil {
+				clients[i].Companies[j].Workers = []models.Worker{}
+			}
 		}
 	}
 
@@ -30,7 +36,7 @@ func GetClient(c *fiber.Ctx) error {
 
 	var client models.Client
 
-	if err := database.DB.Preload("Companies").First(&client, id).Error; err != nil {
+	if err := database.DB.Preload("Companies.Workers").First(&client, id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"error": "Cliente non trovato",
 		})
@@ -38,6 +44,12 @@ func GetClient(c *fiber.Ctx) error {
 
 	if client.Companies == nil {
 		client.Companies = []models.Company{}
+	}
+
+	for i := range client.Companies {
+		if client.Companies[i].Workers == nil {
+			client.Companies[i].Workers = []models.Worker{}
+		}
 	}
 
 	return c.JSON(client)
@@ -98,13 +110,34 @@ func DeleteClient(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := database.DB.Delete(&client).Error; err != nil {
+	tx := database.DB.Begin()
+
+	if err := tx.Where("company_id IN (?)",
+		tx.Model(&models.Company{}).Select("id").Where("client_id = ?", id),
+	).Delete(&models.Worker{}).Error; err != nil {
+		tx.Rollback()
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Errore eliminazione lavoratori collegati",
+		})
+	}
+
+	if err := tx.Where("client_id = ?", id).Delete(&models.Company{}).Error; err != nil {
+		tx.Rollback()
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Errore eliminazione aziende collegate",
+		})
+	}
+
+	if err := tx.Delete(&client).Error; err != nil {
+		tx.Rollback()
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Errore eliminazione cliente",
 		})
 	}
 
+	tx.Commit()
+
 	return c.JSON(fiber.Map{
-		"message": "Cliente eliminato correttamente",
+		"message": "Cliente, aziende e lavoratori collegati eliminati correttamente",
 	})
 }

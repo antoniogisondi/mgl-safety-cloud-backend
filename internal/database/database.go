@@ -30,6 +30,7 @@ func Migrate() {
 		&models.User{},
 		&models.Client{},
 		&models.Company{},
+		&models.Worker{},
 	)
 
 	if err != nil {
