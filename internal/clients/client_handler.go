@@ -10,10 +10,16 @@ import (
 func GetClients(c *fiber.Ctx) error {
 	var clients []models.Client
 
-	if err := database.DB.Find(&clients).Error; err != nil {
+	if err := database.DB.Preload("Companies").Find(&clients).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Errore recupero clienti",
 		})
+	}
+
+	for i := range clients {
+		if clients[i].Companies == nil {
+			clients[i].Companies = []models.Company{}
+		}
 	}
 
 	return c.JSON(clients)
@@ -24,10 +30,14 @@ func GetClient(c *fiber.Ctx) error {
 
 	var client models.Client
 
-	if err := database.DB.First(&client, id).Error; err != nil {
+	if err := database.DB.Preload("Companies").First(&client, id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"error": "Cliente non trovato",
 		})
+	}
+
+	if client.Companies == nil {
+		client.Companies = []models.Company{}
 	}
 
 	return c.JSON(client)

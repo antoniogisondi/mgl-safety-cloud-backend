@@ -18,7 +18,7 @@ type Company struct {
 	Notes      string `json:"notes"`
 
 	ClientID uint   `gorm:"not null" json:"client_id"`
-	Client   Client `gorm:"foreignKey:ClientID" json:"client"`
+	Client   Client `gorm:"foreignKey:ClientID" json:"-"`
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
