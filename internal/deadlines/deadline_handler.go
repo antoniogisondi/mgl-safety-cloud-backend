@@ -173,3 +173,82 @@ func DeleteDeadline(c *fiber.Ctx) error {
 		"message": "Scadenza eliminata correttamente",
 	})
 }
+
+func GetExpiredDeadlines(c *fiber.Ctx) error {
+	var deadlines []models.Deadline
+	now := time.Now()
+
+	if err := database.DB.
+		Where("expiration_date < ?", now).
+		Find(&deadlines).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Errore recupero scadenze scadute",
+		})
+	}
+
+	for i := range deadlines {
+		deadlines[i].Status = calculateStatus(deadlines[i].ExpirationDate)
+	}
+
+	return c.JSON(deadlines)
+}
+
+func GetExpiringDeadlines(c *fiber.Ctx) error {
+	var deadlines []models.Deadline
+	now := time.Now()
+	limit := now.AddDate(0, 0, 30)
+
+	if err := database.DB.
+		Where("expiration_date >= ? AND expiration_date <= ?", now, limit).
+		Find(&deadlines).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Errore recupero scadenze in scadenza",
+		})
+	}
+
+	for i := range deadlines {
+		deadlines[i].Status = calculateStatus(deadlines[i].ExpirationDate)
+	}
+
+	return c.JSON(deadlines)
+}
+
+func GetDeadlinesByCompany(c *fiber.Ctx) error {
+	companyID := c.Params("companyId")
+
+	var deadlines []models.Deadline
+
+	if err := database.DB.
+		Where("company_id = ?", companyID).
+		Find(&deadlines).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Errore recupero scadenze azienda",
+		})
+	}
+
+	for i := range deadlines {
+		deadlines[i].Status = calculateStatus(deadlines[i].ExpirationDate)
+	}
+
+	return c.JSON(deadlines)
+}
+
+func GetDeadlinesByWorker(c *fiber.Ctx) error {
+	workerID := c.Params("workerId")
+
+	var deadlines []models.Deadline
+
+	if err := database.DB.
+		Where("worker_id = ?", workerID).
+		Find(&deadlines).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"error": "Errore recupero scadenze lavoratore",
+		})
+	}
+
+	for i := range deadlines {
+		deadlines[i].Status = calculateStatus(deadlines[i].ExpirationDate)
+	}
+
+	return c.JSON(deadlines)
+}

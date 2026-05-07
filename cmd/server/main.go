@@ -74,6 +74,10 @@ func main() {
 	protected.Delete("/workers/:id", workers.DeleteWorker)
 
 	protected.Get("/deadlines", deadlines.GetDeadlines)
+	protected.Get("/deadlines/expired", deadlines.GetExpiredDeadlines)
+	protected.Get("/deadlines/expiring", deadlines.GetExpiringDeadlines)
+	protected.Get("/companies/:companyId/deadlines", deadlines.GetDeadlinesByCompany)
+	protected.Get("/workers/:workerId/deadlines", deadlines.GetDeadlinesByWorker)
 	protected.Get("/deadlines/:id", deadlines.GetDeadline)
 	protected.Post("/deadlines", deadlines.CreateDeadline)
 	protected.Put("/deadlines/:id", deadlines.UpdateDeadline)
