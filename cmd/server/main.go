@@ -20,6 +20,10 @@ import (
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/workers"
 
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/deadlines"
+
+	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/dashboard"
+
+	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/deadlinecategories"
 )
 
 func main() {
@@ -82,6 +86,11 @@ func main() {
 	protected.Post("/deadlines", deadlines.CreateDeadline)
 	protected.Put("/deadlines/:id", deadlines.UpdateDeadline)
 	protected.Delete("/deadlines/:id", deadlines.DeleteDeadline)
+
+	protected.Get("/dashboard/stats", dashboard.GetStats)
+
+	protected.Get("/deadline-categories", deadlinecategories.GetCategories)
+	protected.Post("/deadline-categories", deadlinecategories.CreateCategory)
 
 	log.Fatal(app.Listen(":8080"))
 }

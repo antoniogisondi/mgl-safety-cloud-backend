@@ -32,6 +32,7 @@ func Migrate() {
 		&models.Company{},
 		&models.Worker{},
 		&models.Deadline{},
+		&models.DeadlineCategory{},
 	)
 
 	if err != nil {
