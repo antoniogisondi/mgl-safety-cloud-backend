@@ -12,6 +12,10 @@ import (
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/auth"
 
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/middleware"
+
+	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/clients"
+
+	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/companies"
 )
 
 func main() {
@@ -46,6 +50,18 @@ func main() {
 			"role":    c.Locals("role"),
 		})
 	})
+
+	protected.Get("/clients", clients.GetClients)
+	protected.Get("/clients/:id", clients.GetClient)
+	protected.Post("/clients", clients.CreateClient)
+	protected.Put("/clients/:id", clients.UpdateClient)
+	protected.Delete("/clients/:id", clients.DeleteClient)
+
+	protected.Get("/companies", companies.GetCompanies)
+	protected.Get("/companies/:id", companies.GetCompany)
+	protected.Post("/companies", companies.CreateCompany)
+	protected.Put("/companies/:id", companies.UpdateCompany)
+	protected.Delete("/companies/:id", companies.DeleteCompany)
 
 	log.Fatal(app.Listen(":8080"))
 }
