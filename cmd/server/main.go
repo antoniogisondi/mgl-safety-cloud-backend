@@ -10,6 +10,8 @@ import (
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/database"
 
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/auth"
+
+	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/middleware"
 )
 
 func main() {
@@ -34,6 +36,16 @@ func main() {
 
 	api.Post("/auth/register", auth.Register)
 	api.Post("/auth/login", auth.Login)
+
+	protected := api.Group("/", middleware.Protected())
+
+	protected.Get("/me", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"user_id": c.Locals("user_id"),
+			"email":   c.Locals("email"),
+			"role":    c.Locals("role"),
+		})
+	})
 
 	log.Fatal(app.Listen(":8080"))
 }
