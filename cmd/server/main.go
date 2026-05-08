@@ -26,6 +26,8 @@ import (
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/deadlinecategories"
 
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/seeders"
+
+	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/notifications"
 )
 
 func main() {
@@ -94,6 +96,11 @@ func main() {
 
 	protected.Get("/deadline-categories", deadlinecategories.GetCategories)
 	protected.Post("/deadline-categories", deadlinecategories.CreateCategory)
+
+	protected.Get("/notifications", notifications.GetNotifications)
+	protected.Put("/notifications/:id/read", notifications.MarkAsRead)
+	protected.Delete("/notifications/:id", notifications.DeleteNotification)
+	protected.Post("/notifications/generate-deadline-alerts", notifications.GenerateDeadlineAlerts)
 
 	log.Fatal(app.Listen(":8080"))
 }
