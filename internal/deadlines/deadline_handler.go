@@ -31,7 +31,7 @@ func calculateStatus(expirationDate *time.Time) string {
 func GetDeadlines(c *fiber.Ctx) error {
 	var deadlines []models.Deadline
 
-	if err := database.DB.Find(&deadlines).Error; err != nil {
+	if err := database.DB.Preload("Category").Find(&deadlines).Error; err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"error": "Errore recupero scadenze",
 		})
@@ -49,7 +49,7 @@ func GetDeadline(c *fiber.Ctx) error {
 
 	var deadline models.Deadline
 
-	if err := database.DB.First(&deadline, id).Error; err != nil {
+	if err := database.DB.Preload("Category").First(&deadline, id).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"error": "Scadenza non trovata",
 		})
@@ -69,15 +69,29 @@ func CreateDeadline(c *fiber.Ctx) error {
 		})
 	}
 
+	// Controllo azienda
 	var company models.Company
+
 	if err := database.DB.First(&company, deadline.CompanyID).Error; err != nil {
 		return c.Status(404).JSON(fiber.Map{
 			"error": "Azienda collegata non trovata",
 		})
 	}
 
+	// Controllo categoria
+	var category models.DeadlineCategory
+
+	if err := database.DB.First(&category, deadline.CategoryID).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{
+			"error": "Categoria scadenza non trovata",
+		})
+	}
+
+	// Controllo lavoratore
 	if deadline.WorkerID != nil {
+
 		var worker models.Worker
+
 		if err := database.DB.First(&worker, *deadline.WorkerID).Error; err != nil {
 			return c.Status(404).JSON(fiber.Map{
 				"error": "Lavoratore collegato non trovato",
@@ -91,13 +105,18 @@ func CreateDeadline(c *fiber.Ctx) error {
 		}
 	}
 
+	// Calcolo stato
 	deadline.Status = calculateStatus(deadline.ExpirationDate)
 
+	// Creazione scadenza
 	if err := database.DB.Create(&deadline).Error; err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "Errore creazione scadenza",
 		})
 	}
+
+	// Reload con categoria
+	database.DB.Preload("Category").First(&deadline, deadline.ID)
 
 	return c.Status(201).JSON(deadline)
 }
