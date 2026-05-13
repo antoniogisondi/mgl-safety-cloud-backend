@@ -3,23 +3,23 @@ package models
 import "time"
 
 type Company struct {
-	ID         uint       `gorm:"primaryKey" json:"id"`
-	Name       string     `gorm:"not null" json:"name"`
-	VatNumber  string     `json:"vat_number"`
-	FiscalCode string     `json:"fiscal_code"`
-	Email      string     `json:"email"`
-	Phone      string     `json:"phone"`
-	Address    string     `json:"address"`
-	City       string     `json:"city"`
-	Province   string     `json:"province"`
-	PostalCode string     `json:"postal_code"`
-	AtecoCode  string     `json:"ateco_code"`
-	Activity   string     `json:"activity"`
-	Notes      string     `json:"notes"`
-	ClientID   uint       `gorm:"not null" json:"client_id"`
-	Client     Client     `gorm:"foreignKey:ClientID" json:"-"`
-	Workers    []Worker   `json:"workers"`
-	Deadlines  []Deadline `json:"deadlines"`
-	CreatedAt  time.Time  `json:"created_at"`
-	UpdatedAt  time.Time  `json:"updated_at"`
+	ID             uint   `gorm:"primaryKey" json:"id"`
+	UserID         uint   `gorm:"not null" json:"user_id"`
+	RagioneSociale string `gorm:"not null" json:"ragione_sociale"`
+	VatNumber      string `json:"vat_number"`
+	FiscalCode     string `json:"fiscal_code"`
+	Address        string `json:"address"`
+	City           string `json:"city"`
+	Province       string `json:"province"`
+	PostalCode     string `json:"postal_code"`
+	ATECO          string `json:"ateco"`
+	Attivita       string `json:"attivita"`
+	Notes          string `json:"notes"`
+
+	User      User       `gorm:"foreignKey:UserID" json:"-"`
+	Workers   []Worker   `gorm:"foreignKey:CompanyID" json:"workers,omitempty"`
+	Deadlines []Deadline `gorm:"foreignKey:CompanyID" json:"deadlines,omitempty"`
+
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }

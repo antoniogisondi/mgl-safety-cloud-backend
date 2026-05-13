@@ -21,7 +21,6 @@ func GetStats(c *fiber.Ctx) error {
 	now := time.Now()
 	limit := now.AddDate(0, 0, 30)
 
-	database.DB.Model(&models.Client{}).Count(&clientsCount)
 	database.DB.Model(&models.Company{}).Count(&companiesCount)
 	database.DB.Model(&models.Worker{}).Count(&workersCount)
 	database.DB.Model(&models.Deadline{}).Count(&deadlinesCount)
