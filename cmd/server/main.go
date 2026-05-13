@@ -23,8 +23,6 @@ import (
 
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/deadlinecategories"
 
-	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/seeders"
-
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/notifications"
 
 	"github.com/antoniogisondi/mgl-safety-cloud-backend/internal/scheduler"
@@ -39,7 +37,6 @@ func main() {
 
 	database.Connect()
 	database.Migrate()
-	seeders.SeedDeadlineCategories()
 	scheduler.StartScheduler()
 
 	app := fiber.New()
